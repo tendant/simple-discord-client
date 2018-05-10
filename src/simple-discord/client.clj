@@ -1,4 +1,4 @@
-(ns simple.discord
+(ns simple-discord.client
   (:require [clj-http.client :as http]))
 
 ;; https://discordapp.com/developers/docs/reference
