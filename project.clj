@@ -1,4 +1,4 @@
-(defproject simple-discord-client "0.1.0-SNAPSHOT"
+(defproject simple-discord-client "0.1.0"
   :description "Simple Clojure discord client api, simple wrapper of discord Rest API."
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
