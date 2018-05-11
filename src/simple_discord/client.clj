@@ -17,17 +17,32 @@
   channel-id: the id of this channel. Type snowflake
   message: {:content \"string, required, the message contents(up to 2000 characters)\"}"
   [auth channel-id message]
-  (let [token-type (cond
-                     (:bot auth) "Bot"
-                     (:bearer auth) "Bearer")
-        token (or (:bot auth) (:bearer auth))
-        authorization (format "%s %s" token-type token)
-        uri (format "/channels/%s/messages" channel-id)
-        resp (http/post (endpoint uri)
-               {:headers {"Authorization" authorization}
-                :content-type :json
-                :accept :json
-                :form-params message
-                :throw-exceptions false})]
-    (println "status:" (:status resp))
-    resp))
+  (if (clojure.string/blank? message)
+    (println "discord create-message: blank message")
+    (let [token-type (cond
+                       (:bot auth) "Bot"
+                       (:bearer auth) "Bearer")
+          token (or (:bot auth) (:bearer auth))
+          authorization (format "%s %s" token-type token)
+          uri (format "/channels/%s/messages" channel-id)
+          truncated-message (if (> (.length message) 2000)
+                              (subs message 0 2000)
+                              message)
+          resp (http/post (endpoint uri)
+                          {:headers {"Authorization" authorization}
+                           :content-type :json
+                           :accept :json
+                           :form-params truncated-message
+                           :throw-exceptions false})]
+      (println "status:" (:status resp))
+      resp)))
+
+(defn create-message-long
+  "Send long message, split message for up to 5 separated messages"
+  [auth channel-id message]
+  (let [col (re-seq #"(?s).{1,1990}" message)
+        messages (take 5 col)]
+    (doseq [msg messages]
+      (create-message auth
+                      channel-id
+                      message))))
