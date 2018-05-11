@@ -22,9 +22,12 @@
                      (:bearer auth) "Bearer")
         token (or (:bot auth) (:bearer auth))
         authorization (format "%s %s" token-type token)
-        uri (format "/channels/%s/messages" channel-id)]
-    (http/post (endpoint uri)
+        uri (format "/channels/%s/messages" channel-id)
+        resp (http/post (endpoint uri)
                {:headers {"Authorization" authorization}
                 :content-type :json
                 :accept :json
-                :form-params message})))
+                :form-params message
+                :throw-exceptions false})]
+    (println "status:" (:status resp))
+    resp))
